@@ -1,0 +1,36 @@
+
+import numpy as np
+import sys!
+{sys.executable} -m pip install pint
+import os
+os.environ['PINT_ARRAY_PROTOCOL_FALLBACK'] = "0"
+import matplotlib.pyplot as plt
+%pylab inline
+import matplotlib
+matplotlib.rcParams.update({'font.size': 24, 'text.usetex': False})
+import numpy as np
+# Melting and boiling points at 1 atm
+T_melt_0 = 301.6*u.K
+T_boil_0 = 944*u.K
+P_0  = 1*u.atm
+Melting point  = (301.6 kelvin, 1 standard_atmosphere)
+Boiling point  = (944 kelvin, 1 standard_atmosphere)
+# melting: solid to liquid 
+H_melt = 2.09*u.kJ/u.mol
+V_melt = 0.09*u.cc/u.mol
+S_melt = H_melt/T_melt_0
+# boiling: liquid to gas
+H_boil = 63.9*u.kJ/u.mol
+S_boil = H_boil/T_boil_0
+T_melt = np.linspace(T_melt_0.magnitude-0.01,T_melt_0.magnitude+2,500)*u.K # array of temp points
+P_melt_H = P_0 + H_melt/V_melt*np.log(T_melt/T_melt_0)                  # array of pressure point
+P_melt_S = P_0 + S_melt/V_melt*(T_melt-T_melt_0)                        # array of pressure point
+"Clausius Clapeyron slope = ", (S_melt/V_melt).to('MPa/K')
+fig = plt.figure(figsize=(9,7))
+plt.semilogy((T_melt/u.K).magnitude, (P_melt_H/u.Pa).magnitude, 'b-', linewidth=3.0)
+plt.semilogy((T_melt/u.K).magnitude, (P_melt_S/u.Pa).magnitude, 'r--', linewidth=3.0)
+plt.scatter([(T_melt_0/u.K).magnitude],[(P_0/u.Pa).magnitude],s=100, facecolors='none', edgecolors='k')
+plt.xlabel('$T$ [K]')
+plt.ylabel('$p$ [Pa]')
+plt.title('Solid-Liquid Phase Boundary')
+plt.show()
